@@ -1,4 +1,4 @@
-package aws_service
+package aws
 
 import (
 	"context"

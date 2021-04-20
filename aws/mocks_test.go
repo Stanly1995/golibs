@@ -2,7 +2,7 @@
 // Source: interface.go
 
 // Package aws is a generated GoMock package.
-package aws_service
+package aws
 
 import (
 	context "context"

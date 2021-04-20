@@ -1,4 +1,4 @@
-package aws_service
+package aws
 
 import (
 	"bytes"
@@ -33,14 +33,14 @@ type AWSConnector struct {
 	ctx       context.Context
 }
 
-// NewAWSConnector is constructor, receives aws_service session, bucket and aws_service url,
+// NewAWSConnector is constructor, receives aws session, bucket and aws url,
 func NewAWSConnector(awsInfo AWSInfo, timeout time.Duration, ctx context.Context, svc s3Client, g dataGenerate) (*AWSConnector, error) {
 	params_validator.ValidateParamsWithPanic(svc, g)
 	if awsInfo.Bucket == "" {
 		return nil, errors.New("bucket is empty")
 	}
 	if awsInfo.URL == "" {
-		return nil, errors.New("aws_service url is empty")
+		return nil, errors.New("aws url is empty")
 	}
 	if timeout <= 5*time.Second {
 		return nil, errors.New("timeout is negative")
@@ -72,7 +72,7 @@ func NewFile(fileObj *string) (*File, error) {
 	}, nil
 }
 
-// PutFile puts input file to aws_service and return url for to download this file
+// PutFile puts input file to aws and return url for to download this file
 // returns error if PutObject returns error
 // Where is name - filename with extension, dataUrl - file body in dataURL format
 func (awsConn *AWSConnector) PutFile(fileObj *string) (string, error) {

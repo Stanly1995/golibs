@@ -1,4 +1,4 @@
-package aws_service
+package aws
 
 import (
 	"context"
@@ -74,14 +74,14 @@ func TestClientStatusUpdater_NewAWSConnector(t *testing.T) {
 			wantErr:          errors.New("bucket is empty"),
 		},
 		{
-			desc: "Should returns error when aws_service url is empty",
+			desc: "Should returns error when aws url is empty",
 			awsInfo: AWSInfo{
 				Bucket: "test",
 			},
 			svc:              NewMockiS3Client(ctrl),
 			generator:        NewMockiGenerate(ctrl),
 			wantAWSConnector: nil,
-			wantErr:          errors.New("aws_service url is empty"),
+			wantErr:          errors.New("aws url is empty"),
 		},
 		{
 			desc: "Should returns error when timeout is negative",
