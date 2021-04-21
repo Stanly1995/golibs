@@ -98,6 +98,10 @@ func (wsc *WsConn) close() {
 	wsc.closeCb(wsc.uuid)
 }
 
+func (wsc *WsConn) Close() {
+	wsc.close()
+}
+
 // ReceiveCb sets a callback which will be called
 // when message from client side was received.
 func (wsc *WsConn) ReceiveCb(cb func(msg []byte, connUUID string)) {
