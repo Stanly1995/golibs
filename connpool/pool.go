@@ -148,3 +148,15 @@ func (ccp *ConnPool) PingWaitForConn(wait int, connID string) error {
 	}
 	return conn.PingWait(wait)
 }
+
+// GetConnByID gets connection by connection id.
+func (ccp *ConnPool) GetConnByID(id string) (IConn, error) {
+	ccp.mu.Lock()
+	defer ccp.mu.Unlock()
+
+	conn, ok := ccp.pool[id]
+	if !ok {
+		return nil, ErrWrongConnID
+	}
+	return conn, nil
+}
