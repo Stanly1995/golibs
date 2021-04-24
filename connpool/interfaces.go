@@ -10,6 +10,7 @@ import (
 // IConn is a wrapper of websocket connection used
 // for messages between FE and BE and between BEs
 type IConn interface {
+	Close()
 	Send(msg []byte) error
 	CloseCb(cb func(connUUID string))
 	PingWait(wait int) error
