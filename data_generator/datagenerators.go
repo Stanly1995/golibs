@@ -15,3 +15,11 @@ func (g *DataGenerators) GenerateTime() string {
 func (g *DataGenerators) GenerateUUID() string {
 	return uuid.NewV4().String()
 }
+
+func (g *DataGenerators) GenerateUnixTime() int64 {
+	return time.Now().Unix()
+}
+
+func (g *DataGenerators) GenerateUnixTimeString() string {
+	return strconv.FormatInt(time.Now().Unix(), 10)
+}
