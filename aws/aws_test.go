@@ -1,7 +1,6 @@
 package aws
 
 import (
-	"context"
 	"errors"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -59,7 +58,6 @@ func TestClientStatusUpdater_NewAWSConnector(t *testing.T) {
 		desc             string
 		awsInfo          AWSInfo
 		timeout          time.Duration
-		ctx              context.Context
 		svc              *MockiS3Client
 		generator        *MockiGenerate
 		wantAWSConnector *AWSConnector
@@ -119,7 +117,7 @@ func TestClientStatusUpdater_NewAWSConnector(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.desc, func(t *testing.T) {
 			// actual
-			got, gotErr := NewAWSConnector(c.awsInfo, c.timeout, c.ctx, c.svc, c.generator)
+			got, gotErr := NewAWSConnector(c.awsInfo, c.timeout, c.svc, c.generator)
 
 			// assert
 			assert.Equal(t, c.wantAWSConnector, got)
@@ -135,7 +133,6 @@ func TestClientStatusUpdater_PutFile(t *testing.T) {
 	stubFileObj := "name:{img.png},dataUrl:{data:image/png;base64,iVBggg==}"
 	stubFileObjBad := "dataUrl:{data:image/png;base64,iVBORw0KGgoA=="
 	stubBadContent := "name:{img.png},dataUrl:{data:image/png;}"
-	stubCtx := context.Background()
 
 	// arrange
 	cases := []struct {
@@ -143,7 +140,6 @@ func TestClientStatusUpdater_PutFile(t *testing.T) {
 		fileObj            *string
 		svc                *MockiS3Client
 		generator          *MockiGenerate
-		ctx                context.Context
 		wantUniqueFileName string
 		wantErr            error
 	}{
@@ -177,7 +173,6 @@ func TestClientStatusUpdater_PutFile(t *testing.T) {
 					Return(errors.New("AWS returned error, saving file failed"))
 				return m
 			}(NewMockiS3Client(ctrl)),
-			ctx:                stubCtx,
 			wantUniqueFileName: "",
 			wantErr:            errors.New("AWS returned error, saving file failed"),
 		},
@@ -194,7 +189,6 @@ func TestClientStatusUpdater_PutFile(t *testing.T) {
 					Return(nil)
 				return m
 			}(NewMockiS3Client(ctrl)),
-			ctx:                stubCtx,
 			wantUniqueFileName: "time_111_img.png",
 			wantErr:            nil,
 		},
@@ -211,7 +205,7 @@ func TestClientStatusUpdater_PutFile(t *testing.T) {
 				Secret: "secret",
 				Token:  "",
 			}
-			aws, _ := NewAWSConnector(awsInfo, time.Minute, stubCtx, c.svc, c.generator)
+			aws, _ := NewAWSConnector(awsInfo, time.Minute, c.svc, c.generator)
 			got, gotErr := aws.PutFile(c.fileObj)
 
 			// assert
@@ -224,8 +218,6 @@ func TestClientStatusUpdater_PutFile(t *testing.T) {
 func TestClientStatusUpdater_SetBucketReadOnlyPolicy(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-
-	stubCtx := context.Background()
 
 	// arrange
 	cases := []struct {
@@ -265,7 +257,7 @@ func TestClientStatusUpdater_SetBucketReadOnlyPolicy(t *testing.T) {
 				Secret: "secret",
 				Token:  "",
 			}
-			aws, _ := NewAWSConnector(awsInfo, time.Minute, stubCtx, c.svc, c.generator)
+			aws, _ := NewAWSConnector(awsInfo, time.Minute, c.svc, c.generator)
 			gotErr := aws.SetBucketReadOnlyPolicy()
 
 			// assert

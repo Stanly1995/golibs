@@ -30,11 +30,10 @@ type AWSConnector struct {
 	AWSInfo   AWSInfo
 	svc       s3Client
 	generator dataGenerate
-	ctx       context.Context
 }
 
 // NewAWSConnector is constructor, receives aws session, bucket and aws url,
-func NewAWSConnector(awsInfo AWSInfo, timeout time.Duration, ctx context.Context, svc s3Client, g dataGenerate) (*AWSConnector, error) {
+func NewAWSConnector(awsInfo AWSInfo, timeout time.Duration, svc s3Client, g dataGenerate) (*AWSConnector, error) {
 	params_validator.ValidateParamsWithPanic(svc, g)
 	if awsInfo.Bucket == "" {
 		return nil, errors.New("bucket is empty")
@@ -50,7 +49,6 @@ func NewAWSConnector(awsInfo AWSInfo, timeout time.Duration, ctx context.Context
 		AWSInfo:   awsInfo,
 		svc:       svc,
 		generator: g,
-		ctx:       ctx,
 	}, nil
 }
 
@@ -87,21 +85,21 @@ func (awsConn *AWSConnector) PutFile(fileObj *string) (string, error) {
 	}
 
 	var cancelFn func()
-
-	awsConn.ctx, cancelFn = context.WithTimeout(awsConn.ctx, awsConn.timeout)
+	ctx := context.Background()
+	ctx, cancelFn = context.WithTimeout(ctx, awsConn.timeout)
 
 	defer cancelFn()
 
 	select {
 	case <-time.After(10 * time.Millisecond):
 		log.Info("file upload started after waiting ten milliseconds")
-	case <-awsConn.ctx.Done():
-		log.Error(awsConn.ctx.Err()) // prints "context deadline exceeded"
+	case <-ctx.Done():
+		log.Error(ctx.Err()) // prints "context deadline exceeded"
 	}
 
 	uniqueFileName := fmt.Sprintf("%s_%s_%s", awsConn.generator.GenerateTime(), awsConn.generator.GenerateUUID(), file.fileName)
 
-	err = awsConn.svc.PutObjectWithContext(awsConn.ctx, &s3.PutObjectInput{
+	err = awsConn.svc.PutObjectWithContext(ctx, &s3.PutObjectInput{
 		Body:   bytes.NewReader(dataURLDec.Data),
 		Bucket: &awsConn.AWSInfo.Bucket,
 		Key:    &uniqueFileName,
