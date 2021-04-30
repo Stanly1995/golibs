@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"context"
 	"errors"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -206,7 +207,8 @@ func TestClientStatusUpdater_PutFile(t *testing.T) {
 				Token:  "",
 			}
 			aws, _ := NewAWSConnector(awsInfo, time.Minute, c.svc, c.generator)
-			got, gotErr := aws.PutFile(c.fileObj)
+			ctx := context.Background()
+			got, gotErr := aws.PutFile(ctx, c.fileObj)
 
 			// assert
 			assert.Equal(t, c.wantUniqueFileName, got)

@@ -73,7 +73,7 @@ func NewFile(fileObj *string) (*File, error) {
 // PutFile puts input file to aws and return url for to download this file
 // returns error if PutObject returns error
 // Where is name - filename with extension, dataUrl - file body in dataURL format
-func (awsConn *AWSConnector) PutFile(fileObj *string) (string, error) {
+func (awsConn *AWSConnector) PutFile(ctx context.Context, fileObj *string) (string, error) {
 	file, err := NewFile(fileObj)
 	if err != nil {
 		return "", err
@@ -85,7 +85,9 @@ func (awsConn *AWSConnector) PutFile(fileObj *string) (string, error) {
 	}
 
 	var cancelFn func()
-	ctx := context.Background()
+	if ctx == nil {
+		ctx = context.Background()
+	}
 	ctx, cancelFn = context.WithTimeout(ctx, awsConn.timeout)
 
 	defer cancelFn()
