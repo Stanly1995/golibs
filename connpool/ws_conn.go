@@ -13,7 +13,7 @@ const (
 	// pingMessage is body of incoming ping message
 	pingMessage       = "."
 	maxPingMessageLen = 4
-	maxPingWait       = 1200 * time.Second
+	maxPingWait       = 20 * time.Second
 )
 
 // WsConn is a new websocket client/server wrapper
